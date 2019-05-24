@@ -1,0 +1,24 @@
+TODO
+
+use sequence to sort highest to lowest (currently just inserting events in the desired order, not sorting.
+read project and collection codes from preferences file
+see https://www.riverbankcomputing.com/static/Docs/PyQt5/api/qtcore/qsettings.html?highlight=qsettings#PyQt5.QtCore.QSettings
+Make session timer pausable
+Re-implement logging
+Execute functions (cleanup, session log, etc) before exit - https://stackoverflow.com/questions/3832880/is-there-a-way-to-call-a-function-right-before-a-pyqt-application-ends
+
+Create Windows standalone app/exe - (https://build-system.fman.io/)
+Create a session JSON (include all image events in it?)
+
+DONE - size columns (self.tableWidget.resizeColumnsToContents())
+DONE - Add event sequence to table
+DONE - Add session timer
+DONE - Add image count and rate
+
+Add session and station values:
+DONE - imaging date, station uuid, station id, taxa, notes
+tags, processing date
+
+LATER
+Process to automatically generate a session folder then start monitoring it. Use default pattern for naming
+Generate session summary in CSV when session ended
