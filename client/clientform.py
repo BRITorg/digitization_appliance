@@ -1,6 +1,7 @@
 import datetime
 
 from PyQt5.QtCore import QThread, QAbstractTableModel, QModelIndex, Qt, QObject, pyqtSignal, pyqtSlot, QTimer
+from PyQt5.QtGui import QBrush
 from PyQt5.QtWidgets import QApplication, QWidget, QFileDialog, QDialog, QTableWidgetItem, QAbstractScrollArea, QHeaderView
 from PyQt5.QtWidgets import QMainWindow
 
@@ -281,6 +282,14 @@ class SessionTableModel(QAbstractTableModel):
                 return event.raw_image_creation_date
             elif column == STATUS:
                 return event.status
+        # Background color:
+        # https://stackoverflow.com/a/44104745/560798
+        if role == Qt.BackgroundRole:
+            #if QSqlQueryModel.data(self, self.index(item.row(), 2), Qt.DisplayRole) == "Young":
+            #    return QBrush(Qt.yellow)
+            if column == STATUS:
+                return QBrush(Qt.yellow)
+
 
     def headerData(self, section, orientation, role=Qt.DisplayRole):
         if role == Qt.TextAlignmentRole:
