@@ -64,6 +64,9 @@ class ClientForm(QMainWindow):
         self.session_technicianName = None
         self.session_projectCode = None
         self.sessionStartTime = None
+        self.session_notes = None
+        self.session_taxa = None
+        self.session_station_code = None
         # manual slot connection
         self.ui.buttonSessionPath.clicked.connect(self.showSessionPathDialog)
         self.ui.buttonSessionData.clicked.connect(self.showSessionDialog)
