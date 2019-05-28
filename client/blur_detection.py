@@ -12,12 +12,12 @@ import numpy
 import pywt
 import sys
 
-def detect_blurry_image(image, thresh=35, MinZero=0.05):
+def blur_detect(image, thresh=35, MinZero=0.05):
 
     if type(image) is str: 
         image = Image.open(sys.argv[1]).convert('F')
         image = numpy.asarray(image)
-    
+
     # original:
     # x_cropped = image[0:(numpy.shape(image)[0]/16)*16 - 1, 0:(numpy.shape(image)[1]/16)*16 - 1]
     x_cropped = image[0:(int(numpy.shape(image)[0]/16)*16 - 1), 0:(int(numpy.shape(image)[1]/16)*16 - 1)]
@@ -97,11 +97,16 @@ def detect_blurry_image(image, thresh=35, MinZero=0.05):
     BlurExtent = float(N_brg) / N_rg
 
     if per > MinZero:
-        print('Not blurred')
-        return False
+        #print('Not blurred')
+        return False, per, BlurExtent
     else:
-        print ('Blurred')
-        return True
+        #print ('Blurred')
+        return True, per, BlurExtent
 
 if __name__=='__main__':
-    detect_blurry_image(sys.argv[1])
+    is_blurry, per, blur_extent = blur_detect(sys.argv[1])
+    if is_blurry:
+        print('Blurry:', per, blur_extent)
+    else:
+        print('Not blurry:', per, blur_extent)
+
