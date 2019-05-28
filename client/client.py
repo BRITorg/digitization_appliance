@@ -7,6 +7,7 @@ import time
 import uuid
 
 import utilities
+import blur_detection
 
 from watchdog.events import PatternMatchingEventHandler
 from watchdog.observers import Observer
@@ -297,9 +298,7 @@ class ImageEvent():
             print('ERROR, original_derived_image is None.')
 
     def is_minimally_complete(self):
-        """
-        Determines if the image_event is complete enough to serialize
-        """
+        """ Determines if the image_event is complete enough to serialize. """
         if hasattr(self, 'catalog_number'):
             if len(self.catalog_number) > 0:
                 return True
@@ -309,9 +308,11 @@ class ImageEvent():
         return False
 
     def serialize_image_event(self):
-        # Save JSON record
-        # disabling test for minimal record
-        # may implement again if needed
+        """
+        Save JSON record
+        disabling test for minimal record
+        may implement again if needed
+        """
         # if self.is_minimally_complete():
         # if self.session.path:
         if self.session_path:
