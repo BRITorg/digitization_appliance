@@ -1,3 +1,5 @@
+# Slightly adapted by Jason Best (jbest@brit.org)
+
 """ This is an implementation of the paper found here: http://www.cs.cmu.edu/~htong/pdf/ICME04_tong.pdf 
     Extended from https://gist.github.com/shahriman/3289170
 """
@@ -16,8 +18,9 @@ def detect_blurry_image(image, thresh=35, MinZero=0.05):
         image = Image.open(sys.argv[1]).convert('F')
         image = numpy.asarray(image)
     
-    x_cropped = image[0:(numpy.shape(image)[0]/16)*16 - 1, \
-                        0:(numpy.shape(image)[1]/16)*16 - 1]
+    # original:
+    # x_cropped = image[0:(numpy.shape(image)[0]/16)*16 - 1, 0:(numpy.shape(image)[1]/16)*16 - 1]
+    x_cropped = image[0:(int(numpy.shape(image)[0]/16)*16 - 1), 0:(int(numpy.shape(image)[1]/16)*16 - 1)]
 
     LL1,(LH1,HL1,HH1) = pywt.dwt2(x_cropped,'haar')
     LL2,(LH2,HL2,HH2) = pywt.dwt2(LL1      ,'haar')
@@ -26,8 +29,10 @@ def detect_blurry_image(image, thresh=35, MinZero=0.05):
     Emap2 = numpy.square(LH2) + numpy.square(HL2) + numpy.square(HH2)
     Emap3 = numpy.square(LH3) + numpy.square(HL3) + numpy.square(HH3)
 
-    dimx=numpy.shape(Emap1)[0] / 8
-    dimy=numpy.shape(Emap1)[1] / 8
+    #dimx=numpy.shape(Emap1)[0] / 8
+    dimx=int(numpy.shape(Emap1)[0] / 8)
+    #dimy=numpy.shape(Emap1)[1] / 8
+    dimy=int(numpy.shape(Emap1)[1] / 8)
     Emax1 = []
     vert = 1
     for j in range(0, dimx - 2):
@@ -38,8 +43,8 @@ def detect_blurry_image(image, thresh=35, MinZero=0.05):
             horz = horz + 8
         vert = vert + 8
 
-    dimx = numpy.shape(Emap2)[0] / 4
-    dimy = numpy.shape(Emap2)[1] / 4
+    dimx = int(numpy.shape(Emap2)[0] / 4)
+    dimy = int(numpy.shape(Emap2)[1] / 4)
     Emax2 = []
     vert = 1
     for j in range(0,dimx - 2):
@@ -50,8 +55,8 @@ def detect_blurry_image(image, thresh=35, MinZero=0.05):
             horz = horz+4
         vert=vert+4
 
-    dimx = numpy.shape(Emap3)[0]/2
-    dimy = numpy.shape(Emap3)[1]/2
+    dimx = int(numpy.shape(Emap3)[0]/2)
+    dimy = int(numpy.shape(Emap3)[1]/2)
     Emax3 = []
     vert=1
     for j in range(0, dimx - 2):
@@ -92,10 +97,10 @@ def detect_blurry_image(image, thresh=35, MinZero=0.05):
     BlurExtent = float(N_brg) / N_rg
 
     if per > MinZero:
-        print 'Not blurred'
+        print('Not blurred')
         return False
     else:
-        print 'Blurred'
+        print ('Blurred')
         return True
 
 if __name__=='__main__':
