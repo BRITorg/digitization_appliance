@@ -119,7 +119,7 @@ class Session():
         """
         Accepts an image_path
         Checks if file_name has been registered
-        Creates event or updates event 
+        Creates event or updates event
         """
         if image_path is not None:
             # search for existing image event with matching image filename
@@ -234,17 +234,17 @@ class ImageEvent():
 
     def evaluate_blurriness(self):
         if self.original_derived_image:
-            try:
-                #TODO file name might be changed before blur is evaluated
-                # test both original and new paths?
-                is_blurry, per, blur_extent = blur_detection.blur_detect(self.original_derived_image)
-                self.is_blurry = is_blurry
-                self.blurriness = blur_extent
-                #return is_blurry, blur_extent
-            except:
-                #TODO find likely exceptions
-                #return None, None
-                pass
+            #try:
+            #TODO file name might be changed before blur is evaluated
+            # test both original and new paths?
+            is_blurry, per, blur_extent = blur_detection.blur_detect(self.original_derived_image)
+            self.is_blurry = is_blurry
+            self.blurriness = blur_extent
+            print('evaluate_blurriness:', is_blurry, blur_extent)
+            #except Exception as e:
+            #    print('evaluate_blurriness: ERROR:', e)
+        else:
+            print('evaluate_blurriness: no self.original_derived_image')
 
     def update_image_event_status(self):
         status = ''
@@ -280,7 +280,7 @@ class ImageEvent():
                 self.original_derived_image = original_image_path
                 self.populate_derived_metadata()
                 # evaluate blurriness
-                self.evaluate_blurriness()
+                #self.evaluate_blurriness()
                 # print('Updating existing image event with JPG image metadata.')
             else:
                 print('ERROR: no matching file extension to generate image event.')
@@ -317,6 +317,8 @@ class ImageEvent():
                 self.catalog_number = None
                 self.other_catalog_numbers = None
                 print('WARNING - no barcode found.')
+            # evaluate blurriness
+            self.evaluate_blurriness()
             self.update_image_event_status()
         else:
             print('ERROR, original_derived_image is None.')
