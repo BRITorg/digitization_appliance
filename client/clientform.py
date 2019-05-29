@@ -12,10 +12,12 @@ from ui_clientform import Ui_DigitizationClient
 from ui_sessionform import Ui_SessionForm
 
 # table column indexes
-SEQUENCE, BARCODE, FILENAME, TIME, STATUS = range(5)
+SEQUENCE, BARCODE, FILENAME, TIME, STATUS, STATUS_LEVEL = range(6)
 # status colors
-WARNING_COLOR = QColor(255, 150, 150)
-
+INFO_COLOR = QColor(180, 200, 255)
+OK_COLOR = QColor(150, 255, 150)
+WARNING_COLOR = QColor(255, 255, 150)
+ERROR_COLOR = QColor(255, 150, 150)
 
 class SessionForm(QDialog):
     def __init__(self, parent=None, technicianName=None, collectionCode=None, projectCode=None, taxa=None, notes=None, station_code=None):
@@ -26,7 +28,7 @@ class SessionForm(QDialog):
         self.collectionCode = collectionCode
         self.projectCode = projectCode
         self.taxa = taxa
-        self.notes =  notes
+        self.notes = notes
         self.station_code = station_code
         # populate form
         # TODO get existing values if any and set text/combo box
@@ -270,16 +272,16 @@ class SessionTableModel(QAbstractTableModel):
         return(len(self.image_events))
 
     def columnCount(self, index=QModelIndex()):
-        return 5
+        return 6
 
     def data(self, index, role=Qt.DisplayRole):
         column = index.column()
         event = self.image_events[index.row()]
-        # SEQUENCE, BARCODE, FILENAME, TIME, STATUS
+        # SEQUENCE, BARCODE, FILENAME, TIME, STATUS, STATUS_LEVEL
         if role == Qt.DisplayRole:
             if column == SEQUENCE:
                 return event.sequence
-            if column == BARCODE:
+            elif column == BARCODE:
                 return event.catalog_number
             elif column == FILENAME:
                 return event.original_filename
@@ -287,20 +289,25 @@ class SessionTableModel(QAbstractTableModel):
                 return event.raw_image_creation_date
             elif column == STATUS:
                 return event.status
+            elif column == STATUS_LEVEL:
+                return event.status_level
         # Background color:
         # https://stackoverflow.com/a/44104745/560798
         if role == Qt.BackgroundRole:
             #if QSqlQueryModel.data(self, self.index(item.row(), 2), Qt.DisplayRole) == "Young":
             #    return QBrush(Qt.yellow)
-            if column == STATUS:
-                status_string = self.data(index=index, role=Qt.DisplayRole)
+            if column == STATUS_LEVEL:
+                #status_string = self.data(index=index, role=Qt.DisplayRole)
+                status_level = self.data(index=index, role=Qt.DisplayRole)
                 # print('status_string:', status_string)
-                if 'WARNING' in status_string:
-                    return QBrush(Qt.red)
-                if 'Raw' in status_string:
-                    #return QBrush(Qt.green)
-                    return QBrush(WARNING_COLOR)
-
+                if status_level == 'WARNING':
+                    return WARNING_COLOR
+                if status_level == 'INFO':
+                    return INFO_COLOR
+                if status_level == 'ERROR':
+                    return ERROR_COLOR
+                if status_level == 'OK':
+                    return OK_COLOR
 
                 #if self.data(index=index, role=Qt.DisplayRole) == "Young":
                 # return QBrush(Qt.yellow)
@@ -317,7 +324,7 @@ class SessionTableModel(QAbstractTableModel):
         if orientation == Qt.Horizontal:
             if section == SEQUENCE:
                 return "#"
-            if section == BARCODE:
+            elif section == BARCODE:
                 return "Barcode"
             elif section == FILENAME:
                 return "Filename"
@@ -325,6 +332,8 @@ class SessionTableModel(QAbstractTableModel):
                 return "Time"
             elif section == STATUS:
                 return "Status"
+            elif section == STATUS_LEVEL:
+                return "Status level"
         return int(section + 1)
 
 

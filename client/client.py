@@ -216,6 +216,7 @@ class ImageEvent():
         # Generate GUID for image event
         self.id = str(uuid.uuid4())
         self.status = ''
+        self.status_level = ''
         self.original_raw_image = None
         self.new_raw_image = None
         self.raw_image_creation_date = None
@@ -234,13 +235,18 @@ class ImageEvent():
         # check if both raw and derived files exist
         if self.original_raw_image and self.original_derived_image:
             status = 'Images complete.'
+            self.status_level = 'OK'
+            # TODO check if barcode was read
         else:
             if self.original_raw_image:
                 status = 'Raw image recorded.'
+                self.status_level = 'INFO'
             elif self.original_derived_image:
                 status = 'Derived image recorded.'
+                self.status_level = 'INFO'
             else:
                 status = 'No images recorded.'
+                self.status_level = 'ERROR'
         self.status = status
         print('STATUS:', status)
 
