@@ -202,7 +202,7 @@ class ImageEvent():
             self.collection_code = session.collection_code
             self.project_code = session.project_code
             self.session_notes = session.notes
-            self.session_taxa = session.taxa 
+            self.session_taxa = session.taxa
             self.station_code = session.station_code
         else:
             # self.session = None
@@ -225,10 +225,26 @@ class ImageEvent():
         self.new_derived_image = None
         self.original_filename = None  # Used as key to match raw and derived image file
         self.catalog_number = None
+        self.is_blurry = None
+        self.blurriness = None
         if original_image_path is not None:
             self.update_image_event(original_image_path=original_image_path)
         else:
             print('ERROR: missing original_image_path')
+
+    def evaluate_blurriness(self):
+        if self.original_derived_image:
+            try:
+                #TODO file name might be changed before blur is evaluated
+                # test both original and new paths?
+                is_blurry, per, blur_extent = blur_detection.blur_detect(self.original_derived_image)
+                self.is_blurry = is_blurry
+                self.blurriness = blur_extent
+                #return is_blurry, blur_extent
+            except:
+                #TODO find likely exceptions
+                #return None, None
+                pass
 
     def update_image_event_status(self):
         status = ''
@@ -263,6 +279,8 @@ class ImageEvent():
             elif file_extension.upper() == '.JPG':
                 self.original_derived_image = original_image_path
                 self.populate_derived_metadata()
+                # evaluate blurriness
+                self.evaluate_blurriness()
                 # print('Updating existing image event with JPG image metadata.')
             else:
                 print('ERROR: no matching file extension to generate image event.')
