@@ -1,7 +1,7 @@
 import datetime
 
 from PyQt5.QtCore import QThread, QAbstractTableModel, QModelIndex, Qt, QObject, pyqtSignal, pyqtSlot, QTimer
-from PyQt5.QtGui import QBrush
+from PyQt5.QtGui import QBrush, QColor
 from PyQt5.QtWidgets import QApplication, QWidget, QFileDialog, QDialog, QTableWidgetItem, QAbstractScrollArea, QHeaderView
 from PyQt5.QtWidgets import QMainWindow
 
@@ -13,6 +13,8 @@ from ui_sessionform import Ui_SessionForm
 
 # table column indexes
 SEQUENCE, BARCODE, FILENAME, TIME, STATUS = range(5)
+# status colors
+WARNING_COLOR = QColor(255, 150, 150)
 
 
 class SessionForm(QDialog):
@@ -291,7 +293,17 @@ class SessionTableModel(QAbstractTableModel):
             #if QSqlQueryModel.data(self, self.index(item.row(), 2), Qt.DisplayRole) == "Young":
             #    return QBrush(Qt.yellow)
             if column == STATUS:
-                return QBrush(Qt.yellow)
+                status_string = self.data(index=index, role=Qt.DisplayRole)
+                # print('status_string:', status_string)
+                if 'WARNING' in status_string:
+                    return QBrush(Qt.red)
+                if 'Raw' in status_string:
+                    #return QBrush(Qt.green)
+                    return QBrush(WARNING_COLOR)
+
+
+                #if self.data(index=index, role=Qt.DisplayRole) == "Young":
+                # return QBrush(Qt.yellow)
 
 
     def headerData(self, section, orientation, role=Qt.DisplayRole):
