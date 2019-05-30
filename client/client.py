@@ -234,15 +234,15 @@ class ImageEvent():
 
     def evaluate_blurriness(self):
         if self.original_derived_image:
-            #try:
             #TODO file name might be changed before blur is evaluated
             # test both original and new paths?
-            is_blurry, per, blur_extent = blur_detection.blur_detect(self.original_derived_image)
-            self.is_blurry = is_blurry
-            self.blurriness = blur_extent
-            print('evaluate_blurriness:', is_blurry, blur_extent)
-            #except Exception as e:
-            #    print('evaluate_blurriness: ERROR:', e)
+            try:
+                is_blurry, per, blur_extent = blur_detection.blur_detect(self.original_derived_image)
+                self.is_blurry = is_blurry
+                self.blurriness = blur_extent
+                print('evaluate_blurriness:', is_blurry, blur_extent)
+            except Exception as e:
+                print('evaluate_blurriness: ERROR:', e)
         else:
             print('evaluate_blurriness: no self.original_derived_image')
 
@@ -263,6 +263,10 @@ class ImageEvent():
             else:
                 status = 'No images recorded.'
                 self.status_level = 'ERROR'
+        if self.is_blurry == True:
+            status = status + ' BLURRY.'
+            self.status_level = 'WARNING'
+
         self.status = status
         print('STATUS:', status)
 
