@@ -16,7 +16,7 @@ SEQUENCE, BARCODE, FILENAME, TIME, STATUS, STATUS_LEVEL = range(6)
 # status colors
 INFO_COLOR = QColor(180, 200, 255)
 OK_COLOR = QColor(150, 255, 150)
-WARNING_COLOR = QColor(255, 255, 150)
+WARNING_COLOR = QColor(255, 230, 50)
 ERROR_COLOR = QColor(255, 150, 150)
 
 class SessionForm(QDialog):
@@ -282,7 +282,10 @@ class SessionTableModel(QAbstractTableModel):
             if column == SEQUENCE:
                 return event.sequence
             elif column == BARCODE:
-                return event.catalog_number
+                if event.catalog_number:
+                    return event.catalog_number
+                else:
+                    return '[NONE]'
             elif column == FILENAME:
                 return event.original_filename
             elif column == TIME:
@@ -294,8 +297,6 @@ class SessionTableModel(QAbstractTableModel):
         # Background color:
         # https://stackoverflow.com/a/44104745/560798
         if role == Qt.BackgroundRole:
-            #if QSqlQueryModel.data(self, self.index(item.row(), 2), Qt.DisplayRole) == "Young":
-            #    return QBrush(Qt.yellow)
             if column == STATUS_LEVEL:
                 #status_string = self.data(index=index, role=Qt.DisplayRole)
                 status_level = self.data(index=index, role=Qt.DisplayRole)
