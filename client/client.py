@@ -1,3 +1,4 @@
+import configparser
 import datetime
 import json
 import logging
@@ -32,6 +33,9 @@ IMAGE_PATTERNS = RAW_IMAGE_PATTERNS + DERIVED_IMAGE_PATTERNS
 valid_catalog_number_patterns = ['BRIT\d+$', 'NLU\d+$', 'ANHC\d+$', 'UARK\d+$', '\d+$']
 REQUIRED_CATALOG_NUMBER_PREFIX = ''  # This will be prepended to the selected catalog_number if it doesn't exist
 SESSION_LOGGER = logging.getLogger('session_log')
+config_local_path = 'config_local.ini'
+# config_path = 'config.ini'
+
 # trim_leading_barcode_zeroes = True # Zeros will be removed from barcodes if this is True
 # Request imager's name
 # Request path of image directory
@@ -59,6 +63,20 @@ def begin_session():
     print('Monitoring session folder:', session['path'])
     print('Press Ctrl +  C to end session.')
 
+class Client():
+    def __init__(self):
+        # Load config_local
+        config_local = configparser.ConfigParser(allow_no_value=True)
+        config_local.read(config_local_path)
+        try:
+            station_uuid = config_local.get('LOCAL','station_uuid')
+            station_id = config_local.get('LOCAL','station_id')
+        except (configparser.NoOptionError, configparser.NoSectionError) as e:
+            print('Can not read options', e)
+            station_uuid = None
+            station_id = None
+        self.station_uuid = station_uuid
+        self.station_id = station_id
 
 class Session():
     def __init__(self, session_path=None, client_ui=None):
@@ -70,6 +88,7 @@ class Session():
         self.image_events = []
         self.start_time = None
         self.client_ui = client_ui
+
         print('client.Session: Session initialized.')
 
     def start(self):
@@ -253,6 +272,9 @@ class ImageEvent():
             status = 'Images complete.'
             self.status_level = 'OK'
             # TODO check if barcode was read
+            if self.catalog_number == None:
+                status = 'Images complete. No barcode.'
+                self.status_level = 'WARNING'
         else:
             if self.original_raw_image:
                 status = 'Raw image recorded.'
@@ -552,5 +574,6 @@ def end_session_old():
 
 
 if __name__ == '__main__':
-    main()
-    main_monitor()
+    #main()
+    #main_monitor()
+    client = Client()
