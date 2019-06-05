@@ -1,6 +1,8 @@
 TODO
 
 CLIENT
+Add QC - Blurry to table
+
 use sequence to sort highest to lowest (currently just inserting events in the desired order, not sorting.
 read project and collection codes from preferences file
 see https://www.riverbankcomputing.com/static/Docs/PyQt5/api/qtcore/qsettings.html?highlight=qsettings#PyQt5.QtCore.QSettings
@@ -29,7 +31,13 @@ Process to automatically generate a session folder then start monitoring it. Use
 Generate session summary in CSV when session ended
 
 SERVER
-compile session data, write to SQLite, CSV
+write to CSV
 Juypter notebook to analyze session
 convert CR2 to DNG, write metadata to files, generate JPG
+DONE - compile session data, write to SQLite
+
+DEMO
+Get more JSON records - Rachel's session etc.
+	
+
 
