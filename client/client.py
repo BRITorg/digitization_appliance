@@ -77,6 +77,8 @@ class Client():
             station_id = None
         self.station_uuid = station_uuid
         self.station_id = station_id
+        # Client can only have one active session at at time.
+        self.session = None
 
 class Session():
     def __init__(self, session_path=None, client_ui=None):
@@ -87,7 +89,10 @@ class Session():
         self.username = None
         self.image_events = []
         self.start_time = None
+        # TODO move client_ui to Client class
+        # make it work with both CLI and GUI
         self.client_ui = client_ui
+        # self.client = WIP
 
         print('client.Session: Session initialized.')
 
