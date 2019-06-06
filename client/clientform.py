@@ -33,8 +33,7 @@ class SessionForm(QDialog):
         # Populate text fields
         self.ui.technicianNameLineEdit.setText(self.technicianName)
         self.ui.taxaLineEdit.setText(self.taxa)
-        # TODO set notes field, it does not have a setText method
-        #self.ui.plainTextNotes.setText(self.notes)
+        self.ui.plainTextNotes.insertPlainText(self.notes)
         # Populate combo boxes
         # Select current collection code
         collection_code_index = self.ui.collectionCodeComboBox.findText(self.collectionCode, Qt.MatchFixedString)
@@ -396,5 +395,6 @@ if __name__ == '__main__':
     ret = app.exec_()
     # cleanup
     # see https://stackoverflow.com/a/3833075/560798 - solution for keeping UI active until close
-    client_ui.session.end_session()
+    if client_ui.session:
+        client_ui.session.end_session()
     sys.exit(ret)
