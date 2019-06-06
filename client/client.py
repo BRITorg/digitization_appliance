@@ -80,6 +80,12 @@ class Session():
         # make it work with both CLI and GUI
         self.client_ui = client_ui
         self.client_instance = client_instance
+        if self.client_instance:
+            print('client_instance:')
+            print(self.client_instance.station_uuid)
+            print(self.client_instance.station_id)
+        else:
+            print('No client_instance.')
         print('client.Session: Session initialized.')
 
     def start(self):
@@ -567,4 +573,5 @@ def end_session_old():
 if __name__ == '__main__':
     #main()
     #main_monitor()
-    client = Client()
+    # TODO reimplement CLI
+    pass

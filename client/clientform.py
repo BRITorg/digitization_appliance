@@ -51,6 +51,8 @@ class ClientForm(QMainWindow):
         super(ClientForm, self).__init__(parent)
         self.ui = Ui_DigitizationClient()
         self.ui.setupUi(self)
+        self.client_instance = client.Client(client_ui=self)
+        print('self.client_instance:', self.client_instance)
         self.model = SessionTableModel()
         self.ui.tableView.setModel(self.model)
         self.timer = QTimer()
@@ -63,7 +65,8 @@ class ClientForm(QMainWindow):
         #self.ui.tableView.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
         self.ui.tableView.horizontalHeader().setSectionResizeMode(QHeaderView.Interactive)
         #self.ui.tableView.horizontalHeader().setSectionResizeMode(QHeaderView.setStretchLastSection(True))
-        self.client_instance = client.Client(client_ui=self)
+        self.client_station_uuid = self.client_instance.station_uuid
+        self.client_station_id = self.client_instance.station_id
         self.session = None
         self.session_collectionCode = None
         self.session_technicianName = None
@@ -159,7 +162,7 @@ class ClientForm(QMainWindow):
 
     def startSession(self):
         print('Creating session for client on station:', self.client_instance.station_uuid)
-        self.session = client.Session(client_ui=self) 
+        self.session = client.Session(client_ui=self, client_instance=self.client_instance) 
         #self.session = self.client
         print('session.uuid:', self.session.uuid)
         # Add session metadata from UI
