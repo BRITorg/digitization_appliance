@@ -42,7 +42,7 @@ class SessionForm(QDialog):
         self.projectCode = self.ui.projectCodeComboBox.currentText()
         self.taxa = self.ui.taxaLineEdit.text()
         self.notes = self.ui.plainTextNotes.toPlainText()
-        self.station_code = self.ui.stationCodeLineEdit.text()
+        #self.station_code = self.ui.stationCodeLineEdit.text()
         super(SessionForm, self).accept()
 
 
@@ -76,7 +76,7 @@ class ClientForm(QMainWindow):
         self.sessionStartTime = None
         self.session_notes = None
         self.session_taxa = None
-        self.session_station_code = None
+        #self.session_station_code = None
         # manual slot connection
         self.ui.buttonSessionPath.clicked.connect(self.showSessionPathDialog)
         self.ui.buttonSessionData.clicked.connect(self.showSessionDialog)
