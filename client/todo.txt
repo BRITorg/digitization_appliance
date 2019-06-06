@@ -17,6 +17,16 @@ Re-implement logging
 option to immediately rename files
 change image.id to image.uuid (to avoid conflict with 'id' when records are ingested into SQL db.)
 
+store defaults on image station:
+accepted_barcode_symbologies
+preferred_barcode_patterns
+project codes
+collection codes
+
+Write session data to JSON file
+If barcode is encountered without matching valid patterns, prompt to allow pattern to be added
+
+
 DONE - size columns (self.tableWidget.resizeColumnsToContents())
 DONE - Add event sequence to table
 DONE - Add session timer
