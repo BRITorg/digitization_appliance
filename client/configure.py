@@ -9,9 +9,10 @@ import click
 config_local_path = 'config_local.ini'
 config_path = 'config.ini'
 config_local = configparser.ConfigParser(allow_no_value=True)
-# TODO check if file exists
+
 
 def main():
+    """Create config_local file or, if it exists, display the settings."""
     if os.path.isfile(config_local_path):
         # config_local file exists
         print('The file ' + config_local_path + ' already exists.')
@@ -21,11 +22,18 @@ def main():
     else:
         # Prompt for local config
         create_config_local()
-        # print(station_uuid, station_id)
 
 
 @click.command()
 def create_config_local():
+    """
+    Create a new config_local file.
+
+    This function prompts the user to enter a station_id
+    and automatically generates a UUID used for the station_uuid.
+    This file contains settings that should be unique to each image station
+    and the file should not be shared or copied between stations.
+    """
     click.echo('The config_local.ini file does not exist.')
     click.echo('Please provide the following information...')
     station_id = click.prompt('Enter a station identifier - this should be short and unique. (eg. \'S1\')')
@@ -37,6 +45,7 @@ def create_config_local():
 
 
 def write_config_local(station_uuid=None, station_id='UNSPECIFIED'):
+    """Write the config_local file."""
     config_local['LOCAL'] = {}
     config_local.set('LOCAL', '# DO NOT SHARE config_local file between imaging stations.', None)
     config_local.set('LOCAL', '# The station_uuid must remain unique to each image station.', None)
