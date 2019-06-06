@@ -18,9 +18,12 @@ def main():
         print('The file ' + config_local_path + ' already exists.')
         print('Confirm the following parameters:')
         config_local.read(config_local_path)
-        print(config_local)
+        for section in config_local.sections():
+            print(section)
+            for key, value in config_local.items(section):
+                print(key, value)
     else:
-        # Prompt for local config
+        # Prompt for local_config settings.
         create_config_local()
 
 
@@ -54,6 +57,8 @@ def write_config_local(station_uuid=None, station_id='UNSPECIFIED'):
 
     with open('config_local.ini', 'w') as config_local_file:
         config_local.write(config_local_file)
+
+    print('Configuration file created:', config_local_path)
 
 if __name__ == '__main__':
     main()
