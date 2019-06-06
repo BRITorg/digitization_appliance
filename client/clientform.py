@@ -63,6 +63,7 @@ class ClientForm(QMainWindow):
         #self.ui.tableView.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
         self.ui.tableView.horizontalHeader().setSectionResizeMode(QHeaderView.Interactive)
         #self.ui.tableView.horizontalHeader().setSectionResizeMode(QHeaderView.setStretchLastSection(True))
+        self.client_instance = client.Client(client_ui=self)
         self.session = None
         self.session_collectionCode = None
         self.session_technicianName = None
@@ -157,7 +158,9 @@ class ClientForm(QMainWindow):
         self.ui.tableView.model().layoutChanged.emit()
 
     def startSession(self):
-        self.session = client.Session(client_ui=self)
+        print('Creating session for client on station:', self.client_instance.station_uuid)
+        self.session = client.Session(client_ui=self) 
+        #self.session = self.client
         print('session.uuid:', self.session.uuid)
         # Add session metadata from UI
         self.session.collection_code = self.session_collectionCode
