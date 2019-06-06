@@ -20,7 +20,7 @@ WARNING_COLOR = QColor(255, 230, 50)
 ERROR_COLOR = QColor(255, 150, 150)
 
 class SessionForm(QDialog):
-    def __init__(self, parent=None, technicianName=None, collectionCode=None, projectCode=None, taxa=None, notes=None, station_code=None):
+    def __init__(self, parent=None, technicianName=None, collectionCode=None, projectCode=None, taxa=None, notes=None):
         super(SessionForm, self).__init__(parent)
         self.ui = Ui_SessionForm()
         self.ui.setupUi(self)
@@ -29,13 +29,23 @@ class SessionForm(QDialog):
         self.projectCode = projectCode
         self.taxa = taxa
         self.notes = notes
-        self.station_code = station_code
-        # populate form
-        # TODO get existing values if any and set text/combo box
-        #self.ui.technicianNameLineEdit.setText(self.technicianName)
+        # Populate form with any existing/established values
+        # Populate text fields
+        self.ui.technicianNameLineEdit.setText(self.technicianName)
+        self.ui.taxaLineEdit.setText(self.taxa)
+        # TODO set notes field, it does not have a setText method
+        #self.ui.plainTextNotes.setText(self.notes)
+        # Populate combo boxes
+        # Select current collection code
+        collection_code_index = self.ui.collectionCodeComboBox.findText(self.collectionCode, Qt.MatchFixedString)
+        if collection_code_index >= 0:
+            self.ui.collectionCodeComboBox.setCurrentIndex(collection_code_index)
+        # Select current project code
+        project_code_index = self.ui.projectCodeComboBox.findText(self.projectCode, Qt.MatchFixedString)
+        if project_code_index >= 0:
+            self.ui.projectCodeComboBox.setCurrentIndex(project_code_index)
         self.exec_()
 
-    # https://stackoverflow.com/a/11553456/560798
     def accept(self):
         self.collectionCode = self.ui.collectionCodeComboBox.currentText()
         self.technicianName = self.ui.technicianNameLineEdit.text()
@@ -201,7 +211,9 @@ class ClientForm(QMainWindow):
             self.ui.sessionPathLineEdit.setText(os.path.abspath(sessionPath))
 
     def showSessionDialog(self):
-        sessionDialog = SessionForm()
+        sessionDialog = SessionForm(technicianName=self.session_technicianName, \
+            collectionCode=self.session_collectionCode, projectCode=self.session_projectCode, \
+            taxa=self.session_taxa, notes=self.session_notes)
         if sessionDialog.result() == QDialog.Rejected:
             # set to previous values?
             print("sessionDialog rejected")
