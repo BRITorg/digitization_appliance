@@ -55,8 +55,10 @@ class ClientForm(QMainWindow):
         print('self.client_instance:', self.client_instance)
         self.model = SessionTableModel()
         self.ui.tableView.setModel(self.model)
+        # Create timer to update the elapsed time and rate and other GUI elements.
+        # Not used for tracking sesison time.
         self.timer = QTimer()
-        self.timer.timeout.connect(self.update_ui) # primarily used to update the elapsed time and rate
+        self.timer.timeout.connect(self.update_ui)
         self.timer.start(1000)
         #TEST setting column width and scroll area
         #self.ui.tableView.setSizeAdjustPolicy(QAbstractScrollArea.AdjustToContents)
@@ -171,7 +173,7 @@ class ClientForm(QMainWindow):
         self.session.project_code = self.session_projectCode
         self.session.notes = self.session_notes
         self.session.taxa = self.session_taxa
-        self.session.station_code = self.session_station_code
+        #self.session.station_code = self.session_station_code
         self.session.path = self.sessionPath
         self.session.event_number = 0 # sequential number for ordering events in list
         if self.session.path:
@@ -210,21 +212,26 @@ class ClientForm(QMainWindow):
             projectCode = sessionDialog.projectCode
             taxa = sessionDialog.taxa
             notes = sessionDialog.notes
-            station_code = sessionDialog.station_code
+            #station_code = sessionDialog.station_code
             # Store values to save in session once it is initialized
             self.session_collectionCode = collectionCode
             self.session_technicianName = technicianName
             self.session_projectCode = projectCode
             self.session_taxa = taxa
             self.session_notes = notes
-            self.session_station_code = station_code
+            #self.session_station_code = station_code
+            station_id = self.client_station_id
+            station_uuid = self.client_station_uuid
             # Write to UI
             sessionDataText = ''
             sessionDataText += 'Name: ' + technicianName + '\n'
             sessionDataText += 'Collection code: ' + collectionCode + '\n'
             sessionDataText += 'Project code: ' + projectCode + '\n'
-            sessionDataText += 'Station code: ' + station_code + '\n'
-            sessionDataText += 'Taxa: ' + taxa + ' Notes: ' + notes
+            #sessionDataText += 'Station code: ' + station_code + '\n'
+            sessionDataText += 'Taxa: ' + taxa + ' Notes: ' + notes + '\n'
+            # Add client information
+            sessionDataText += 'Station ID: ' + station_id + '\n'
+            sessionDataText += 'Station UUID: ' + station_uuid
             self.ui.sessionDataTextBrowser.setText(sessionDataText)
 
 class monitorSessionThread(QThread):
