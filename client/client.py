@@ -13,20 +13,6 @@ import blur_detection
 from watchdog.events import PatternMatchingEventHandler
 from watchdog.observers import Observer
 
-"""
-TODO:
-store defaults on image station:
-station_name
-station_id
-accepted_barcode_symbologies
-preferred_barcode_patterns
-project codes
-collection codes
-
-TODO write session data to JSON file
-TODO if barcode is encountered without matching valid patterns, prompt to allow pattern to be added
-
-"""
 RAW_IMAGE_PATTERNS = ['*.cr2', '*.CR2']  # use later to detect original creation of raw files
 DERIVED_IMAGE_PATTERNS = ['*.jpg', '*.JPG']
 IMAGE_PATTERNS = RAW_IMAGE_PATTERNS + DERIVED_IMAGE_PATTERNS
@@ -64,7 +50,7 @@ def begin_session():
     print('Press Ctrl +  C to end session.')
 
 class Client():
-    def __init__(self):
+    def __init__(self, client_ui=None):
         # Load config_local
         config_local = configparser.ConfigParser(allow_no_value=True)
         config_local.read(config_local_path)
@@ -79,9 +65,10 @@ class Client():
         self.station_id = station_id
         # Client can only have one active session at at time.
         self.session = None
+        self.client_ui = client_ui
 
 class Session():
-    def __init__(self, session_path=None, client_ui=None):
+    def __init__(self, session_path=None, client_instance=None, client_ui=None):
         self.uuid = str(uuid.uuid4())
         self.path = None
         self.project_code = None
@@ -92,8 +79,7 @@ class Session():
         # TODO move client_ui to Client class
         # make it work with both CLI and GUI
         self.client_ui = client_ui
-        # self.client = WIP
-
+        self.client_instance = client_instance
         print('client.Session: Session initialized.')
 
     def start(self):
@@ -117,7 +103,7 @@ class Session():
                 print('Ending by KeyboardInterrupt')
             observer.join()
         else:
-            print('TEST - no path to monitor.')
+            print('No path to monitor.')
 
     def elapsed_time(self):
         # TODO make stopwatch pausable
