@@ -53,37 +53,6 @@
       </property>
      </widget>
     </item>
-    <item row="2" column="0">
-     <widget class="QLabel" name="projectCodeLabel">
-      <property name="text">
-       <string>Project Code</string>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="1">
-     <widget class="QComboBox" name="projectCodeComboBox">
-      <item>
-       <property name="text">
-        <string>TCN-Endless</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>TCN-Ferns</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>BRIT-Texas</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>BRIT-General</string>
-       </property>
-      </item>
-     </widget>
-    </item>
     <item row="1" column="0">
      <widget class="QLabel" name="collectionCodeLabel">
       <property name="text">
@@ -115,42 +84,59 @@
       </item>
      </widget>
     </item>
-    <item row="3" column="0">
-     <widget class="QLabel" name="stationCodeLabel">
+    <item row="2" column="0">
+     <widget class="QLabel" name="projectCodeLabel">
       <property name="text">
-       <string>Station Code</string>
+       <string>Project Code</string>
       </property>
      </widget>
     </item>
-    <item row="3" column="1">
-     <widget class="QLineEdit" name="stationCodeLineEdit">
-      <property name="statusTip">
-       <string comment="First Last" extracomment="Enter your first and last name"/>
-      </property>
+    <item row="2" column="1">
+     <widget class="QComboBox" name="projectCodeComboBox">
+      <item>
+       <property name="text">
+        <string>TCN-Endless</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>TCN-Ferns</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>BRIT-Texas</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>BRIT-General</string>
+       </property>
+      </item>
      </widget>
     </item>
-    <item row="4" column="0">
+    <item row="3" column="0">
      <widget class="QLabel" name="taxaLabel">
       <property name="text">
        <string>Taxa</string>
       </property>
      </widget>
     </item>
-    <item row="4" column="1">
+    <item row="3" column="1">
      <widget class="QLineEdit" name="taxaLineEdit">
       <property name="statusTip">
        <string comment="First Last" extracomment="Enter your first and last name"/>
       </property>
      </widget>
     </item>
-    <item row="5" column="0">
+    <item row="4" column="0">
      <widget class="QLabel" name="notesLabel">
       <property name="text">
        <string>Notes</string>
       </property>
      </widget>
     </item>
-    <item row="5" column="1">
+    <item row="4" column="1">
      <widget class="QPlainTextEdit" name="plainTextNotes"/>
     </item>
    </layout>
