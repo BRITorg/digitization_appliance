@@ -221,6 +221,7 @@ class ImageEvent():
             self.session_taxa = session.taxa
             # self.station_code = session.station_code
             self.station_uuid = session.client_instance.station_uuid
+            self.station_id = session.client_instance.station_id
         else:
             # self.session = None
             self.session_path = None
@@ -231,6 +232,7 @@ class ImageEvent():
             self.session_taxa = None 
             # self.station_code = None
             self.station_uuid = None
+            self.station_id = None
         # Generate GUID for image event
         self.id = str(uuid.uuid4())
         self.status = ''
