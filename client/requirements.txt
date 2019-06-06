@@ -1,13 +1,14 @@
 argh==0.26.2
 certifi==2019.3.9
 chardet==3.0.4
+Click==7.0
 idna==2.8
 numpy==1.16.4
 pathtools==0.1.2
 Pillow==6.0.0
 PyQt5==5.10
 PyQt5-sip==4.19.15
-pywt==1.0.6
+PyWavelets==1.0.3
 PyYAML==5.1
 pyzbar==0.1.8
 requests==2.22.0
