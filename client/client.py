@@ -75,7 +75,7 @@ class Client():
             log_filename = self.station_id + '_' + self.station_uuid + '.log'
         else:
             log_filename = 'UNIDENTIFIED_STATION.log'
-        #log_path = os.path.join(session['path'], log_filename)
+        # log_path = os.path.join(session['path'], log_filename)
         log_path = log_filename
         SESSION_LOGGER.setLevel(logging.DEBUG)
         session_handler = logging.FileHandler(log_path)
@@ -83,7 +83,7 @@ class Client():
         log_formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
         session_handler.setFormatter(log_formatter)
         SESSION_LOGGER.addHandler(session_handler)
-        SESSION_LOGGER.info('Client loading configuration: %s', config_local_path)
+        SESSION_LOGGER.info('Client loaded.')
 
 class Session():
     global SESSION_LOGGER
