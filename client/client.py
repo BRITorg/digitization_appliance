@@ -50,6 +50,7 @@ def begin_session():
     print('Press Ctrl +  C to end session.')
 
 class Client():
+    global SESSION_LOGGER
     def __init__(self, client_ui=None):
         # Load config_local
         config_local = configparser.ConfigParser(allow_no_value=True)
@@ -57,6 +58,7 @@ class Client():
         try:
             station_uuid = config_local.get('LOCAL','station_uuid')
             station_id = config_local.get('LOCAL','station_id')
+            SESSION_LOGGER.info('Client loaded configuration:', config_local_path)
         except (configparser.NoOptionError, configparser.NoSectionError) as e:
             print('Can not read options', e)
             station_uuid = None
@@ -67,7 +69,24 @@ class Client():
         self.session = None
         self.client_ui = client_ui
 
+        # Set up logging
+        print('Setting up logging.')
+        if self.station_uuid:
+            log_filename = self.station_id + '_' + self.station_uuid + '.log'
+        else:
+            log_filename = 'UNIDENTIFIED_STATION.log'
+        #log_path = os.path.join(session['path'], log_filename)
+        log_path = log_filename
+        SESSION_LOGGER.setLevel(logging.DEBUG)
+        session_handler = logging.FileHandler(log_path)
+        session_handler.setLevel(logging.DEBUG)
+        log_formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        session_handler.setFormatter(log_formatter)
+        SESSION_LOGGER.addHandler(session_handler)
+        SESSION_LOGGER.info('Client loading configuration: %s', config_local_path)
+
 class Session():
+    global SESSION_LOGGER
     def __init__(self, session_path=None, client_instance=None, client_ui=None):
         self.uuid = str(uuid.uuid4())
         self.path = None
@@ -206,6 +225,7 @@ class Session():
 
 
 class ImageEvent():
+    global SESSION_LOGGER
     # TODO
     # consider using properties: https://stackoverflow.com/a/2825580/560798
 
@@ -459,6 +479,7 @@ def derive_catalog_numbers(candidates=None):
 
 
 class ImageHandler(PatternMatchingEventHandler):
+    global SESSION_LOGGER
 
     def __init__(self, session=None, patterns=None):
         PatternMatchingEventHandler.__init__(self, patterns=patterns)
