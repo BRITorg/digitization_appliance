@@ -61,7 +61,6 @@ class ClientForm(QMainWindow):
         self.ui = Ui_DigitizationClient()
         self.ui.setupUi(self)
         self.client_instance = client.Client(client_ui=self)
-        print('self.client_instance:', self.client_instance)
         self.model = SessionTableModel()
         self.ui.tableView.setModel(self.model)
         # Create timer to update the elapsed time and rate and other GUI elements.
@@ -145,13 +144,11 @@ class ClientForm(QMainWindow):
                 # Sequential number for event
                 self.session.event_number += 1
                 event.sequence = self.session.event_number
-                print('EVENT SEQ:', event.sequence)
                 # Add event to GUI model
                 # self.model.image_events.append(event)
                 # Adding event to start of list so it sorts in table
                 # TODO - sort the table view instead of the list
                 self.model.image_events.insert(0, event)
-                print('updating table')
                 # TEST sorting
                 #self.ui.tableView.sort(1, 0) #descending
                 #self.ui.tableView.sortByColumn(1, 1) #descending
@@ -161,28 +158,25 @@ class ClientForm(QMainWindow):
                 self.ui.tableView.resizeColumnsToContents()
                 self.emitter_inst.update()
             else:
-                print('No event passed.')
+                # TODO - log this
+                print('ALERT - No event passed.')
         else:
-            print('No session started, can not add event')
+            # TODO - log this
+            print('ALERT - No session started, can not add event')
 
     # @pyqtSlot()
     def update_table_view(self):
         # Test slot used to activate the real slot
-        print('update_table_view')
         self.ui.tableView.model().layoutChanged.emit()
 
     def startSession(self):
-        print('Creating session for client on station:', self.client_instance.station_uuid)
         self.session = client.Session(client_ui=self, client_instance=self.client_instance) 
-        #self.session = self.client
-        print('session.uuid:', self.session.uuid)
         # Add session metadata from UI
         self.session.collection_code = self.session_collectionCode
         self.session.username = self.session_technicianName
         self.session.project_code = self.session_projectCode
         self.session.notes = self.session_notes
         self.session.taxa = self.session_taxa
-        #self.session.station_code = self.session_station_code
         self.session.path = self.sessionPath
         self.session.event_number = 0 # sequential number for ordering events in list
         if self.session.path:
@@ -195,11 +189,11 @@ class ClientForm(QMainWindow):
             start_time = datetime.datetime.now() # time according to UI thread, not actual time from session object.
             self.ui.sessionStatusLineEdit.setText('Session started: ' + str(start_time))
         else:
-            print('No valid session path.')
+            # TODO - log this
+            print('ALERT - No valid session path.')
             self.ui.sessionStatusLineEdit.setText('Invalid path.')
 
     def endSession(self):
-        print('Ending session.')
         self.timer.stop()
 
     def showSessionPathDialog(self):
@@ -214,8 +208,7 @@ class ClientForm(QMainWindow):
             collectionCode=self.session_collectionCode, projectCode=self.session_projectCode, \
             taxa=self.session_taxa, notes=self.session_notes)
         if sessionDialog.result() == QDialog.Rejected:
-            # set to previous values?
-            print("sessionDialog rejected")
+            pass
         else:
             # get values set in form
             collectionCode = sessionDialog.collectionCode
@@ -256,18 +249,15 @@ class monitorSessionThread(QThread):
         self.wait()
 
     def set_session_path(self, sessionPath=None):
-        #print('in set_session_path', sessionPath)
         if sessionPath:
             self.sessionPath = sessionPath
 
     def set_session(self, session=None):
-        #print('in set_session', session)
         if session:
             self.session = session
 
     def run(self):
         if self.session.path:
-            #print('thread: session.start()')
             self.session.start()
         else:
             print('No session path in thread.')
@@ -301,7 +291,6 @@ class SessionTableModel(QAbstractTableModel):
     def data(self, index, role=Qt.DisplayRole):
         column = index.column()
         event = self.image_events[index.row()]
-        # SEQUENCE, BARCODE, FILENAME, TIME, STATUS, STATUS_LEVEL
         if role == Qt.DisplayRole:
             if column == SEQUENCE:
                 return event.sequence
@@ -322,9 +311,7 @@ class SessionTableModel(QAbstractTableModel):
         # https://stackoverflow.com/a/44104745/560798
         if role == Qt.BackgroundRole:
             if column == STATUS_LEVEL:
-                #status_string = self.data(index=index, role=Qt.DisplayRole)
                 status_level = self.data(index=index, role=Qt.DisplayRole)
-                # print('status_string:', status_string)
                 if status_level == 'WARNING':
                     return WARNING_COLOR
                 if status_level == 'INFO':
@@ -333,10 +320,8 @@ class SessionTableModel(QAbstractTableModel):
                     return ERROR_COLOR
                 if status_level == 'OK':
                     return OK_COLOR
-
                 #if self.data(index=index, role=Qt.DisplayRole) == "Young":
                 # return QBrush(Qt.yellow)
-
 
     def headerData(self, section, orientation, role=Qt.DisplayRole):
         if role == Qt.TextAlignmentRole:
