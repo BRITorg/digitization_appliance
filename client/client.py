@@ -307,7 +307,7 @@ class ImageEvent():
                 self.original_derived_image = original_image_path
                 self.populate_derived_metadata()
                 # evaluate blurriness
-                #self.evaluate_blurriness()
+                self.evaluate_blurriness()
                 # print('Updating existing image event with JPG image metadata.')
             else:
                 print('ERROR: no matching file extension to generate image event.')
