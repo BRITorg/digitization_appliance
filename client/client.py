@@ -90,6 +90,8 @@ class Session():
         self.username = None
         self.image_events = []
         self.start_time = None
+        self.notes = None
+        self.taxa = None
         # TODO move client_ui to Client class
         # make it work with both CLI and GUI
         self.client_ui = client_ui
@@ -550,6 +552,21 @@ def main():
     SESSION_LOGGER.info('session_collection: ' + client.session.collection_code)
     SESSION_LOGGER.info('session_project: ' + client.session.project_code)
     SESSION_LOGGER.info('session_directory: ' + client.session.path)
+
+    #global observer
+    # start watching session folder for file additions and changes
+    event_handler = ImageHandler(session=client.session, patterns=IMAGE_PATTERNS)
+    observer = Observer()
+    observer.schedule(event_handler, client.session.path, recursive=True)
+    observer.start()
+    SESSION_LOGGER.info('Session monitor started.')
+    try:
+        while True:
+            time.sleep(1)
+    except KeyboardInterrupt:
+        # end_session()
+        print('Ending by KeyboardInterrupt')
+    observer.join()
 
 
 def main_monitor():
