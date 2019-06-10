@@ -1,3 +1,4 @@
+from argparse import ArgumentParser
 import configparser
 import datetime
 import json
@@ -23,13 +24,6 @@ SESSION_LOGGER = logging.getLogger('session_log')
 config_local_path = 'config_local.ini'
 # config_path = 'config.ini'
 
-# trim_leading_barcode_zeroes = True # Zeros will be removed from barcodes if this is True
-# Request imager's name
-# Request path of image directory
-# Generate session ID
-# Write session log
-# Start monitoring session directory
-# standalone_mode=False
 
 @click.command()
 def begin_session():
@@ -531,35 +525,31 @@ def main():
     # standalone_mode=False prevents click from exiting when all commands are complete
 
     client_parser = ArgumentParser()
-    client_parser.add_argument('session_directory', help='Specify session directory.')
-    client_parser.add_argument('session_username', help='Your first initial and last name')
-    client_parser.add_argument('session_collection', help='The collection code (e.g. VDB, BRIT)')
-    client_parser.add_argument('session_project', choices=['TX', 'Crataegus', 'NONE', 'TEST'], help='The project code (e.g. Crataegus, TX-digi)')
+    client_parser.add_argument('-d', '--directory', required=True, help='Specify session directory.')
+    client_parser.add_argument('-u', '--username', required=True, help='Your first initial and last name')
+    client_parser.add_argument('-c', '--collection', required=True, help='The collection code (e.g. VDB, BRIT)')
+    client_parser.add_argument('-p', '--project', required=True, help='The project code (e.g. Crataegus, TX-digi)')
     args = client_parser.parse_args()
-    session['path'] = os.path.abspath(args.session_directory)
-    session['project'] = args.session_project
-    session['collection_code'] = args.session_collection
-    session['username'] = args.session_username
-    # Create session ID
-    session['id'] = str(uuid.uuid4())
+    client = Client()
+    client.session = Session(client_instance=client)
+    client.session.path = os.path.abspath(args.directory)
+    client.session.project_code = args.project
+    client.session.collection_code = args.collection
+    client.session.username = args.username
     # Set up session logging
-    log_filename = session['id'] + '.log'
-    log_path = os.path.join(session['path'], log_filename)
+    log_filename = str(client.session.uuid) + '.log'
+    log_path = os.path.join(client.session.path, log_filename)
     SESSION_LOGGER.setLevel(logging.DEBUG)
     session_handler = logging.FileHandler(log_path)
     session_handler.setLevel(logging.DEBUG)
     log_formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     session_handler.setFormatter(log_formatter)
     SESSION_LOGGER.addHandler(session_handler)
-    SESSION_LOGGER.info('session_id: ' + session['id'])
-    SESSION_LOGGER.info('session_username: ' + session['username'])
-    SESSION_LOGGER.info('session_collection: ' + session['collection_code'])
-    SESSION_LOGGER.info('session_project: ' + session['project'])
-    SESSION_LOGGER.info('session_directory: ' + session['path'])
-    print(session['path'])
-    print(session['project'])
-    print(session['collection_code'])
-    print(session['username'])
+    SESSION_LOGGER.info('session_id: ' + client.session.uuid)
+    SESSION_LOGGER.info('session_username: ' + client.session.username)
+    SESSION_LOGGER.info('session_collection: ' + client.session.collection_code)
+    SESSION_LOGGER.info('session_project: ' + client.session.project_code)
+    SESSION_LOGGER.info('session_directory: ' + client.session.path)
 
 
 def main_monitor():
@@ -597,7 +587,7 @@ def end_session_old():
 
 
 if __name__ == '__main__':
-    #main()
+    main()
     #main_monitor()
     # TODO reimplement CLI
-    pass
+    #pass
