@@ -1,4 +1,5 @@
 from argparse import ArgumentParser
+import atexit
 import configparser
 import datetime
 import json
@@ -522,7 +523,7 @@ class ImageHandler(PatternMatchingEventHandler):
 
 def main():
     # global observer
-    # atexit.register(end_session)
+
     # Gather session metadata in terminal prompts or command line switches
     # standalone_mode=False prevents click from exiting when all commands are complete
 
@@ -552,6 +553,8 @@ def main():
     SESSION_LOGGER.info('session_collection: ' + client.session.collection_code)
     SESSION_LOGGER.info('session_project: ' + client.session.project_code)
     SESSION_LOGGER.info('session_directory: ' + client.session.path)
+
+    atexit.register(end_cli_session, session=client.session)
 
     #global observer
     # start watching session folder for file additions and changes
@@ -586,21 +589,25 @@ def main_monitor():
     observer.join()
 
 
-def end_session_old():
+def end_cli_session(session=None):
     # TODO try registering cleanup for session variable so it happens after end_session
-    print('Session monitoring ended')
-    # TODO serialize session data
-    print('Session username: {}'.format(session['username']))
-    print('Session ID: {}'.format(session['id']))
-    print('Session path: {}'.format(session['path']))
-    # print('Image event IDs:')
-    for event in session['image_events']:
-        print(event.id, event.catalog_number)
-        event.rename_files()
-    print('Completing final sync...STUB')
-    # os.system("rsync -arz " + session['path'] + " /Users/jbest/Desktop/demo_shared")
+    if session:    
+        print('Session monitoring ended')
+        # TODO serialize session data
+        print('Session username: {}'.format(session.username))
+        print('Session ID: {}'.format(session.uuid))
+        print('Session path: {}'.format(session.path))
+        # print('Image event IDs:')
 
-    SESSION_LOGGER.info('Session monitor terminated.')
+        for event in session.image_events:
+            print(event.id, event.catalog_number)
+            event.rename_files()
+        print('Completing final sync...STUB')
+        # os.system("rsync -arz " + session['path'] + " /Users/jbest/Desktop/demo_shared")
+
+        SESSION_LOGGER.info('Session monitor terminated.')
+    else:
+        print('ERROR - no session to end.')
 
 
 if __name__ == '__main__':
