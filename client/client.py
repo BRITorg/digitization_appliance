@@ -10,6 +10,7 @@ import uuid
 import utilities
 import blur_detection
 
+import click
 from watchdog.events import PatternMatchingEventHandler
 from watchdog.observers import Observer
 
@@ -30,7 +31,7 @@ config_local_path = 'config_local.ini'
 # Start monitoring session directory
 # standalone_mode=False
 
-
+@click.command()
 def begin_session():
     # gather session information and start logging
     session_username = click.prompt('Please enter your first and last name')
@@ -87,9 +88,9 @@ class Client():
 
 class Session():
     global SESSION_LOGGER
-    def __init__(self, session_path=None, client_instance=None, client_ui=None):
+    def __init__(self, path=None, client_instance=None, client_ui=None):
         self.uuid = str(uuid.uuid4())
-        self.path = None
+        self.path = path
         self.project_code = None
         self.collection_code = None
         self.username = None
@@ -249,7 +250,7 @@ class ImageEvent():
             self.collection_code = None
             self.project_code = None
             self.session_notes = None
-            self.session_taxa = None 
+            self.session_taxa = None
             # self.station_code = None
             self.station_uuid = None
             self.station_id = None
