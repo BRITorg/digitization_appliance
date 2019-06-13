@@ -27,7 +27,13 @@ config_local_path = 'config_local.ini'
 
 
 class Client():
-    """Client is the first core object created when the application runs."""
+    """
+    Client is the first core object created when the application runs.
+
+    Gathers configuration parameters.
+
+
+    """
 
     global SESSION_LOGGER
 
@@ -577,6 +583,9 @@ def main(directory=None, username=None, collection=None, project=None):
             time.sleep(1)
     except KeyboardInterrupt:
         print('Ending by KeyboardInterrupt')
+        # For some reason, the atexit isn't always being triggered on Windows although the KeyboardInterrupt is registered
+        # Manually calling end_cli_session
+        end_cli_session(session=client.session)
     observer.join()
 
 def end_cli_session(session=None):
@@ -589,12 +598,14 @@ def end_cli_session(session=None):
         for event in session.image_events:
             print(event.id, event.catalog_number)
             event.rename_files()
-        print('Completing final sync...STUB')
+        #print('Completing final sync...STUB')
         # os.system("rsync -arz " + session['path'] + " /Users/jbest/Desktop/demo_shared")
 
         SESSION_LOGGER.info('Session monitor terminated.')
     else:
-        print('ERROR - no session to end.')
+        print('INFO - no session to end or session already ended.')
+        SESSION_LOGGER.info('No session to end or session already ended.')
+    quit()
 
 
 if __name__ == '__main__':
