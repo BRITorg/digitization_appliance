@@ -1,4 +1,4 @@
-from argparse import ArgumentParser
+# from argparse import ArgumentParser
 import atexit
 import configparser
 import datetime
@@ -25,9 +25,14 @@ SESSION_LOGGER = logging.getLogger('session_log')
 config_local_path = 'config_local.ini'
 # config_path = 'config.ini'
 
+
 class Client():
+    """Client is the first core object created when the application runs."""
+
     global SESSION_LOGGER
+
     def __init__(self, client_ui=None):
+        """Initialize client values."""
         # Load config_local
         config_local = configparser.ConfigParser(allow_no_value=True)
         config_local.read(config_local_path)
@@ -51,7 +56,6 @@ class Client():
             log_filename = self.station_id + '_' + self.station_uuid + '.log'
         else:
             log_filename = 'UNIDENTIFIED_STATION.log'
-        # log_path = os.path.join(session['path'], log_filename)
         log_path = log_filename
         SESSION_LOGGER.setLevel(logging.DEBUG)
         session_handler = logging.FileHandler(log_path)
@@ -86,7 +90,7 @@ class Session():
         print('client.Session: Session initialized.')
 
     def start(self):
-        # When called from the PYQT GUI, start is executed in a QThread
+        """When called from the PYQT GUI, start is executed in a QThread"""
 
         if self.path:
             # TODO make sure path is valid and writable
@@ -109,14 +113,14 @@ class Session():
             print('No path to monitor.')
 
     def elapsed_time(self):
-        # TODO make stopwatch pausable
+        """Return the time elapsed since the session was started."""
         if self.start_time:
             return datetime.datetime.now() - self.start_time
         else:
             return None
 
     def imaging_rate(self):
-        # return the rate of images created per minute
+        """Return the rate of images created per minute."""
         session_duration = self.elapsed_time()
         image_count = len(self.image_events)
         if image_count > 0:
@@ -130,17 +134,26 @@ class Session():
 
     def register_image_event(self, image_path=None):
         """
-        Accepts an image_path
-        Checks if file_name has been registered
-        Creates event or updates event
+        Create an image event or add image file to existing event.
+
+        Determine if the image_path representing an image event has been registered.
+        If the image_path has been resistered (exists in self.image_events) then the
+        existing image event is updated.
+        If the image event has not been registered, a new image event is created
+        then registered in self.image_events.
+
+        Parameters
+        ----------
+        image_path: string
+
+        Returns
+        -------
+        ImageEvent
         """
         if image_path is not None:
             # search for existing image event with matching image filename
             basename = os.path.basename(image_path)
-            #print('image_path:', image_path)
-            #print('basename:', basename)
             filename, file_extension = os.path.splitext(basename)
-            #print('filename', filename)
             # Check if the event has already been registered by comparing the filename
             existing_event = self.matching_image_event(filename)
             if existing_event is not None:
@@ -500,56 +513,14 @@ class ImageHandler(PatternMatchingEventHandler):
             print('ERROR, no image_path')
             SESSION_LOGGER.error('No image path.')
 
-
-#@click.command()
-#@click.pass_context
-def get_session_parameters(ctx):
-    # gather session information and start logging
-    session_username = click.prompt('Please enter your first and last name')
-    SESSION_LOGGER.info('session_username: ' + session_username)
-    #session.username = session_username
-    session_collection = click.prompt('Please enter the collection code (e.g. VDB, BRIT)')
-    SESSION_LOGGER.info('session_collection: ' + session_collection)
-    #session.collection_code = session_collection
-    session_project = click.prompt('Please enter the project code (use \'none\' if no project or unknown.')
-    SESSION_LOGGER.info('session_project: ' + session_project)
-    #session.project = session_project
-    user_session_path = click.prompt('Please enter the path of the session folder', type=click.Path(exists=True))
-    SESSION_LOGGER.info('user_session_path: ' + user_session_path)
-    #session.path = os.path.abspath(user_session_path)
-    print('Monitoring session folder:', user_session_path)
-    print('Press Ctrl +  C to end session.')
-    return ctx
-
-# @click.option('--count', default=1, help='Number of greetings.')
-
-
 @click.command()
 @click.option('-d', '--directory', help='Specify session directory.')
 @click.option('-u', '--username', help='Your first initial and last name')
 @click.option('-c', '--collection', help='The collection code (e.g. VDB, BRIT)')
 @click.option('-p', '--project', help='The project code (e.g. Crataegus, TX-digi)')
 def main(directory=None, username=None, collection=None, project=None):
-    # global observer
-
     # Gather session metadata in terminal prompts or command line switches
     # standalone_mode=False prevents click from exiting when all commands are complete
-    """
-    Disable old Argparse code
-    client_parser = ArgumentParser()
-    client_parser.add_argument('-d', '--directory', help='Specify session directory.')
-    client_parser.add_argument('-u', '--username', help='Your first initial and last name')
-    client_parser.add_argument('-c', '--collection', help='The collection code (e.g. VDB, BRIT)')
-    client_parser.add_argument('-p', '--project', help='The project code (e.g. Crataegus, TX-digi)')
-    args = client_parser.parse_args()
-    print(args)
-    params = vars(args)
-    if len(params) < 4:
-        # Not all parameters were provided
-        # Prompt user for parameters
-        session_parameters = get_session_parameters(standalone_mode=False)
-        print(session_parameters)
-    """
     # gather session information and start logging
     # Prompt user for parameters
     if not username:
@@ -561,7 +532,7 @@ def main(directory=None, username=None, collection=None, project=None):
         SESSION_LOGGER.info('collection: ' + collection)
         # session.collection_code = session_collection
     if not project:
-        project = click.prompt('Please enter the project code (use \'none\' if no project or unknown.')
+        project = click.prompt('Please enter the project code (use \'none\' if no project or unknown.)')
         SESSION_LOGGER.info('project: ' + project)
         # session.project = session_project
     if not directory:
@@ -573,12 +544,10 @@ def main(directory=None, username=None, collection=None, project=None):
 
     client = Client()
     client.session = Session(client_instance=client)
-    #client.session.path = os.path.abspath(args.directory)
     client.session.path = os.path.abspath(directory)
     client.session.project_code = project
     client.session.collection_code = collection
     client.session.username = username
-
 
     # Set up session logging
     log_filename = str(client.session.uuid) + '.log'
@@ -589,11 +558,11 @@ def main(directory=None, username=None, collection=None, project=None):
     log_formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     session_handler.setFormatter(log_formatter)
     SESSION_LOGGER.addHandler(session_handler)
-    SESSION_LOGGER.info('session_id: ' + client.session.uuid)
-    SESSION_LOGGER.info('session_username: ' + client.session.username)
-    SESSION_LOGGER.info('session_collection: ' + client.session.collection_code)
-    SESSION_LOGGER.info('session_project: ' + client.session.project_code)
-    SESSION_LOGGER.info('session_directory: ' + client.session.path)
+    SESSION_LOGGER.info('session.uuid: ' + client.session.uuid)
+    SESSION_LOGGER.info('session.username: ' + client.session.username)
+    SESSION_LOGGER.info('session.collection_code: ' + client.session.collection_code)
+    SESSION_LOGGER.info('session.project_code: ' + client.session.project_code)
+    SESSION_LOGGER.info('session.path: ' + client.session.path)
     # Set up cleanup actions
     atexit.register(end_cli_session, session=client.session)
 
@@ -611,7 +580,7 @@ def main(directory=None, username=None, collection=None, project=None):
     observer.join()
 
 def end_cli_session(session=None):
-    if session:    
+    if session:
         print('Session monitoring ended')
         print('Session username: {}'.format(session.username))
         print('Session ID: {}'.format(session.uuid))
