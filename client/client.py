@@ -262,6 +262,7 @@ class ImageEvent():
         self.new_derived_image = None
         self.original_filename = None  # Used as key to match raw and derived image file
         self.catalog_number = None
+        self.other_catalog_numbers = None
         self.is_blurry = None
         self.blurriness = None
         if original_image_path is not None:
@@ -311,7 +312,6 @@ class ImageEvent():
         print('STATUS:', status)
 
     def update_image_event(self, original_image_path=None):
-        # print('Updating image event')
         SESSION_LOGGER.info('Updating image event: ' + self.id)
         if original_image_path is not None:
             basename = os.path.basename(original_image_path)
@@ -319,22 +319,15 @@ class ImageEvent():
             if file_extension.upper() == '.CR2':
                 self.original_raw_image = original_image_path
                 self.populate_raw_metadata()
-                # print('Updating existing image event with raw image metadata.')
             elif file_extension.upper() == '.JPG':
                 self.original_derived_image = original_image_path
                 self.populate_derived_metadata()
-                # evaluate blurriness
-                self.evaluate_blurriness()
-                # print('Updating existing image event with JPG image metadata.')
             else:
                 print('ERROR: no matching file extension to generate image event.')
             self.update_image_event_status()
 
     def populate_raw_metadata(self):
         if self.original_raw_image is not None:
-            # basename = os.path.basename(self.original_raw_image)
-            # filename, file_extension = os.path.splitext(basename)
-            # self.file_name = filename
             self.raw_image_creation_date = utilities.creation_date(file_path=self.original_raw_image)
             self.raw_image_md5hash = utilities.md5hash(file_path=self.original_raw_image)
         else:
@@ -342,14 +335,10 @@ class ImageEvent():
 
     def populate_derived_metadata(self):
         if self.original_derived_image is not None:
-            # basename = os.path.basename(self.original_derived_image)
-            # filename, file_extension = os.path.splitext(basename)
-            # self.file_name = filename
             self.derived_image_md5hash = utilities.md5hash(file_path=self.original_derived_image)
             # Read barcode values and symbologies from derived imaged
             self.barcodes = utilities.barcodes(file_path=self.original_derived_image)
             # Record barcodes for catalog_number and other_catalog_numbers
-            # TODO also store barcode coordinates (polygon and/or rect)
             barcode_data_list = []
             if self.barcodes:
                 for barcode_record in self.barcodes:
@@ -363,7 +352,6 @@ class ImageEvent():
                 print('WARNING - no barcode found.')
             # evaluate blurriness
             self.evaluate_blurriness()
-            self.update_image_event_status()
         else:
             print('ERROR, original_derived_image is None.')
 
