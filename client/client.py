@@ -25,26 +25,6 @@ SESSION_LOGGER = logging.getLogger('session_log')
 config_local_path = 'config_local.ini'
 # config_path = 'config.ini'
 
-
-@click.command()
-def begin_session():
-    # gather session information and start logging
-    session_username = click.prompt('Please enter your first and last name')
-    SESSION_LOGGER.info('session_username: ' + session_username)
-    session['username'] = session_username
-    session_collection = click.prompt('Please enter the collection code (e.g. VDB, BRIT)')
-    SESSION_LOGGER.info('session_collection: ' + session_collection)
-    session['collection_code'] = session_collection
-    session_project = click.prompt('Please enter the project code (use \'none\' if no project or unknown.')
-    SESSION_LOGGER.info('session_project: ' + session_project)
-    click.echo(session_project)
-    session['project'] = session_project
-    user_session_path = click.prompt('Please enter the path of the session folder', type=click.Path(exists=True))
-    SESSION_LOGGER.info('user_session_path: ' + user_session_path)
-    session['path'] = os.path.abspath(user_session_path)
-    print('Monitoring session folder:', session['path'])
-    print('Press Ctrl +  C to end session.')
-
 class Client():
     global SESSION_LOGGER
     def __init__(self, client_ui=None):
@@ -521,6 +501,27 @@ class ImageHandler(PatternMatchingEventHandler):
             SESSION_LOGGER.error('No image path.')
 
 
+@click.command()
+@click.pass_context
+def get_session_parameters(ctx):
+    # gather session information and start logging
+    session_username = click.prompt('Please enter your first and last name')
+    SESSION_LOGGER.info('session_username: ' + session_username)
+    #session.username = session_username
+    session_collection = click.prompt('Please enter the collection code (e.g. VDB, BRIT)')
+    SESSION_LOGGER.info('session_collection: ' + session_collection)
+    #session.collection_code = session_collection
+    session_project = click.prompt('Please enter the project code (use \'none\' if no project or unknown.')
+    SESSION_LOGGER.info('session_project: ' + session_project)
+    #session.project = session_project
+    user_session_path = click.prompt('Please enter the path of the session folder', type=click.Path(exists=True))
+    SESSION_LOGGER.info('user_session_path: ' + user_session_path)
+    #session.path = os.path.abspath(user_session_path)
+    print('Monitoring session folder:', user_session_path)
+    print('Press Ctrl +  C to end session.')
+    return ctx
+
+
 def main():
     # global observer
 
@@ -528,17 +529,28 @@ def main():
     # standalone_mode=False prevents click from exiting when all commands are complete
 
     client_parser = ArgumentParser()
-    client_parser.add_argument('-d', '--directory', required=True, help='Specify session directory.')
-    client_parser.add_argument('-u', '--username', required=True, help='Your first initial and last name')
-    client_parser.add_argument('-c', '--collection', required=True, help='The collection code (e.g. VDB, BRIT)')
-    client_parser.add_argument('-p', '--project', required=True, help='The project code (e.g. Crataegus, TX-digi)')
+    client_parser.add_argument('-d', '--directory', help='Specify session directory.')
+    client_parser.add_argument('-u', '--username', help='Your first initial and last name')
+    client_parser.add_argument('-c', '--collection', help='The collection code (e.g. VDB, BRIT)')
+    client_parser.add_argument('-p', '--project', help='The project code (e.g. Crataegus, TX-digi)')
     args = client_parser.parse_args()
+    print(args)
+    params = vars(args)
+    if len(params) < 4:
+        # Not all parameters were provided
+        # Prompt user for parameters
+        session_parameters = get_session_parameters(standalone_mode=False)
+        print(session_parameters)
+
     client = Client()
     client.session = Session(client_instance=client)
     client.session.path = os.path.abspath(args.directory)
     client.session.project_code = args.project
     client.session.collection_code = args.collection
     client.session.username = args.username
+    # Prompt user for parameters
+
+
     # Set up session logging
     log_filename = str(client.session.uuid) + '.log'
     log_path = os.path.join(client.session.path, log_filename)
@@ -553,10 +565,9 @@ def main():
     SESSION_LOGGER.info('session_collection: ' + client.session.collection_code)
     SESSION_LOGGER.info('session_project: ' + client.session.project_code)
     SESSION_LOGGER.info('session_directory: ' + client.session.path)
-
+    # Set up cleanup actions
     atexit.register(end_cli_session, session=client.session)
 
-    #global observer
     # start watching session folder for file additions and changes
     event_handler = ImageHandler(session=client.session, patterns=IMAGE_PATTERNS)
     observer = Observer()
@@ -567,37 +578,15 @@ def main():
         while True:
             time.sleep(1)
     except KeyboardInterrupt:
-        # end_session()
         print('Ending by KeyboardInterrupt')
     observer.join()
-
-
-def main_monitor():
-    global observer
-    # start watching session folder for file additions and changes
-    event_handler = ImageHandler(patterns=IMAGE_PATTERNS)
-    observer = Observer()
-    observer.schedule(event_handler, session['path'], recursive=True)
-    observer.start()
-    SESSION_LOGGER.info('Session monitor started.')
-    try:
-        while True:
-            time.sleep(1)
-    except KeyboardInterrupt:
-        # end_session()
-        print('Ending by KeyboardInterrupt')
-    observer.join()
-
 
 def end_cli_session(session=None):
-    # TODO try registering cleanup for session variable so it happens after end_session
     if session:    
         print('Session monitoring ended')
-        # TODO serialize session data
         print('Session username: {}'.format(session.username))
         print('Session ID: {}'.format(session.uuid))
         print('Session path: {}'.format(session.path))
-        # print('Image event IDs:')
 
         for event in session.image_events:
             print(event.id, event.catalog_number)
