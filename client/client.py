@@ -501,8 +501,8 @@ class ImageHandler(PatternMatchingEventHandler):
             SESSION_LOGGER.error('No image path.')
 
 
-@click.command()
-@click.pass_context
+#@click.command()
+#@click.pass_context
 def get_session_parameters(ctx):
     # gather session information and start logging
     session_username = click.prompt('Please enter your first and last name')
@@ -521,13 +521,21 @@ def get_session_parameters(ctx):
     print('Press Ctrl +  C to end session.')
     return ctx
 
+# @click.option('--count', default=1, help='Number of greetings.')
 
-def main():
+
+@click.command()
+@click.option('-d', '--directory', help='Specify session directory.')
+@click.option('-u', '--username', help='Your first initial and last name')
+@click.option('-c', '--collection', help='The collection code (e.g. VDB, BRIT)')
+@click.option('-p', '--project', help='The project code (e.g. Crataegus, TX-digi)')
+def main(directory=None, username=None, collection=None, project=None):
     # global observer
 
     # Gather session metadata in terminal prompts or command line switches
     # standalone_mode=False prevents click from exiting when all commands are complete
-
+    """
+    Disable old Argparse code
     client_parser = ArgumentParser()
     client_parser.add_argument('-d', '--directory', help='Specify session directory.')
     client_parser.add_argument('-u', '--username', help='Your first initial and last name')
@@ -541,14 +549,35 @@ def main():
         # Prompt user for parameters
         session_parameters = get_session_parameters(standalone_mode=False)
         print(session_parameters)
+    """
+    # gather session information and start logging
+    # Prompt user for parameters
+    if not username:
+        username = click.prompt('Please enter your first and last name')
+        SESSION_LOGGER.info('username: ' + username)
+        # session.username = session_username
+    if not collection:
+        collection = click.prompt('Please enter the collection code (e.g. VDB, BRIT)')
+        SESSION_LOGGER.info('collection: ' + collection)
+        # session.collection_code = session_collection
+    if not project:
+        project = click.prompt('Please enter the project code (use \'none\' if no project or unknown.')
+        SESSION_LOGGER.info('project: ' + project)
+        # session.project = session_project
+    if not directory:
+        directory = click.prompt('Please enter the path of the session folder', type=click.Path(exists=True))
+        SESSION_LOGGER.info('directory: ' + directory)
+        # session.path = os.path.abspath(user_session_path)
+    print('Monitoring session folder:', directory)
+    print('Press Ctrl +  C to end session.')
 
     client = Client()
     client.session = Session(client_instance=client)
-    client.session.path = os.path.abspath(args.directory)
-    client.session.project_code = args.project
-    client.session.collection_code = args.collection
-    client.session.username = args.username
-    # Prompt user for parameters
+    #client.session.path = os.path.abspath(args.directory)
+    client.session.path = os.path.abspath(directory)
+    client.session.project_code = project
+    client.session.collection_code = collection
+    client.session.username = username
 
 
     # Set up session logging
@@ -601,6 +630,3 @@ def end_cli_session(session=None):
 
 if __name__ == '__main__':
     main()
-    #main_monitor()
-    # TODO reimplement CLI
-    #pass
