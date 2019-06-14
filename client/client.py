@@ -266,6 +266,7 @@ class ImageEvent():
         self.is_blurry = None
         self.blurriness = None
         if original_image_path is not None:
+            # update image event metadata based on image file
             self.update_image_event(original_image_path=original_image_path)
         else:
             print('ERROR: missing original_image_path')
@@ -312,6 +313,8 @@ class ImageEvent():
         print('STATUS:', status)
 
     def update_image_event(self, original_image_path=None):
+        #TODO can probabnly merge all of this into register_image_event
+        #TODO eliminate this
         SESSION_LOGGER.info('Updating image event: ' + self.id)
         if original_image_path is not None:
             basename = os.path.basename(original_image_path)
@@ -344,7 +347,6 @@ class ImageEvent():
                 for barcode_record in self.barcodes:
                     barcode_data_list.append(barcode_record['data'])
             if len(barcode_data_list) > 0:
-                # print(barcode_data_list)
                 self.catalog_number, self.other_catalog_numbers = derive_catalog_numbers(barcode_data_list)
             else:
                 self.catalog_number = None
@@ -372,7 +374,6 @@ class ImageEvent():
         may implement again if needed
         """
         # if self.is_minimally_complete():
-        # if self.session.path:
         if self.session_path:
             print('serialize_image_event:session_path', self.session_path)
             # TODO - make sure catalog_number can be used in format_filename
@@ -381,14 +382,9 @@ class ImageEvent():
                 json_file_name = catalog_number_string + '_' + self.id + '.JSON'
             else:
                 json_file_name = self.original_filename + '_' + self.id + '.JSON'
-            # Save image event JSON if complete
-            # json_path = os.path.join(session.path., json_file_name)
-            # print('json_path:', json_path)
-            # json_path = os.path.join(self.session.path, json_file_name)
             json_path = os.path.join(self.session_path, json_file_name)
             with open(json_path, 'w') as outfile:
                 json.dump(self.__dict__, outfile, indent=4)
-                # json.dump(self, outfile, indent=4, default=lambda x: x.__dict__)
         else:
             print('No session.path, can not write JSON file.')
 
