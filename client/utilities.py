@@ -149,6 +149,7 @@ def rename_uniquely(image_path=None, catalog_number=None, image_event_id=None):
     Rename a file in place using the catalog number. If the desired filename exists,
     the image event UUID is appended.
     """
+    print(f'rename_uniquely: image_path:{image_path} catalog_number:{catalog_number} image_event_id:{image_event_id}')
     if image_path is not None:
         # Construct desired path
         image_directory, original_image_basename = os.path.split(image_path)
@@ -158,11 +159,13 @@ def rename_uniquely(image_path=None, catalog_number=None, image_event_id=None):
         if os.path.exists(new_image_path):
             # path_is_unique = False
             # construct alternative path
+            print('new_image_path exists:', new_image_path , 'generating new path...')
             new_image_path = os.path.join(image_directory, catalog_number + '_' + image_event_id + image_extension)
             if os.path.exists(new_image_path):
                 path_is_unique = False
             else:
                 path_is_unique = True
+                print('New unique path:', new_image_path)
         else:
             path_is_unique = True
     else:
@@ -176,9 +179,10 @@ def rename_uniquely(image_path=None, catalog_number=None, image_event_id=None):
             os.rename(image_path, new_image_path)
             UTILITIES_LOGGER.info('Renaming - source:' + image_path + ' destination: ' + new_image_path)
             return new_image_path
-        except OSError:
+        except OSError as e:
+            print('ERROR: unable to read file. errno: ' + str(e.errno) + ' filename: ' + str(e.filename) + ' strerror: ' + str(e.strerror) + ' new_image_path: ' + new_image_path)
             # Possible problem with character in new filename
-            print('ALERT - OSError. new path:', new_image_path)
+            #print('ALERT - OSError. new path:', new_image_path)
             UTILITIES_LOGGER.exception('OSError - unspecified problem with path: ' + new_image_path)
             return None
         except:
