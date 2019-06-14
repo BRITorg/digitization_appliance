@@ -215,11 +215,9 @@ class Session():
         for event in self.image_events:
             print(event.id, event.catalog_number)
             event.rename_files()
-        print('Completing final sync...STUB')
+        #print('Completing final sync...STUB')
         # os.system("rsync -arz " + session['path'] + " /Users/jbest/Desktop/demo_shared")
-
         SESSION_LOGGER.info('Session monitor terminated.')
-
 
 class ImageEvent():
     global SESSION_LOGGER
@@ -266,14 +264,8 @@ class ImageEvent():
         self.is_blurry = None
         self.blurriness = None
         if original_image_path is not None:
-            # update image event metadata based on image file
+            # update new image event metadata based on image file
             self.update_image_event(original_image_path=original_image_path)
-            """
-            if session:
-                session.register_image_event(image_path=original_image_path)
-            else:
-                print('ERROR - missing session')
-            """
         else:
             print('ERROR: missing original_image_path')
 
@@ -383,7 +375,8 @@ class ImageEvent():
             # TODO - make sure catalog_number can be used in format_filename
             catalog_number_string = self.catalog_number
             if catalog_number_string:
-                json_file_name = catalog_number_string + '_' + self.id + '.JSON'
+                #json_file_name = catalog_number_string + '_' + self.id + '.JSON'
+                json_file_name = catalog_number_string + '.JSON'
             else:
                 json_file_name = self.original_filename + '_' + self.id + '.JSON'
             json_path = os.path.join(self.session_path, json_file_name)
@@ -562,7 +555,7 @@ def main(directory=None, username=None, collection=None, project=None):
     SESSION_LOGGER.info('session.path: ' + client.session.path)
     # Set up cleanup actions
     # This may not be needed if Ctrl C works
-    #atexit.register(end_cli_session, session=client.session)
+    atexit.register(end_cli_session, session=client.session)
 
     # start watching session folder for file additions and changes
     event_handler = ImageHandler(session=client.session, patterns=IMAGE_PATTERNS)
@@ -577,7 +570,8 @@ def main(directory=None, username=None, collection=None, project=None):
         print('Ending by KeyboardInterrupt')
         # For some reason, the atexit isn't always being triggered on Windows although the KeyboardInterrupt is registered
         # Manually calling end_cli_session
-        end_cli_session(session=client.session)
+        # TODO need to test if session has been completed/terminated first, if not, call manually
+        #end_cli_session(session=client.session)
     observer.join()
 
 def end_cli_session(session=None):
