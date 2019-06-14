@@ -357,7 +357,7 @@ class ImageEvent():
                 self.other_catalog_numbers = None
                 #print('WARNING - no barcode found.')
             # evaluate blurriness
-            self.evaluate_blurriness()
+            #self.evaluate_blurriness()
         else:
             print('ERROR, original_derived_image is None.')
 
@@ -393,6 +393,7 @@ class ImageEvent():
             print('No session.path, can not write JSON file.')
 
     def rename_files(self):
+        print(f'rename_files CALLED for {self.id}, {self.catalog_number}')
         # TODO re-create JSON after renaming image files to record new paths
         if self.catalog_number is not None:
             print('Catalog number exists, proceeding...')
@@ -560,7 +561,8 @@ def main(directory=None, username=None, collection=None, project=None):
     SESSION_LOGGER.info('session.project_code: ' + client.session.project_code)
     SESSION_LOGGER.info('session.path: ' + client.session.path)
     # Set up cleanup actions
-    atexit.register(end_cli_session, session=client.session)
+    # This may not be needed if Ctrl C works
+    #atexit.register(end_cli_session, session=client.session)
 
     # start watching session folder for file additions and changes
     event_handler = ImageHandler(session=client.session, patterns=IMAGE_PATTERNS)
@@ -579,17 +581,20 @@ def main(directory=None, username=None, collection=None, project=None):
     observer.join()
 
 def end_cli_session(session=None):
+    print('end_cli_session:', session.uuid)
     if session:
         print('Session monitoring ended')
         print('Session username: {}'.format(session.username))
         print('Session ID: {}'.format(session.uuid))
         print('Session path: {}'.format(session.path))
+        print('Image event count:', len(session.image_events))
 
         for event in session.image_events:
             print(event.id, event.catalog_number)
             event.rename_files()
         #print('Completing final sync...STUB')
         # os.system("rsync -arz " + session['path'] + " /Users/jbest/Desktop/demo_shared")
+        session = None
 
         SESSION_LOGGER.info('Session monitor terminated.')
     else:
