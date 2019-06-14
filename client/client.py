@@ -162,25 +162,28 @@ class Session():
             filename, file_extension = os.path.splitext(basename)
             # Check if the event has already been registered by comparing the filename
             existing_event = self.matching_image_event(filename)
-            if existing_event is not None:
-                # Add file info to event
+            if existing_event:
+                # Add file info to existing event
                 # TODO use file pattern vars
                 if file_extension.upper() == '.CR2':
                     existing_event.original_raw_image = image_path
                     print('Added CR2 to existing image event: ' + basename)
                     SESSION_LOGGER.info('Added CR2 to existing event: ' + existing_event.id)
-                    existing_event.populate_raw_metadata()
-                    existing_event.serialize_image_event()
+                    # existing_event.populate_raw_metadata()
+                    # existing_event.serialize_image_event()
                 elif file_extension.upper() == '.JPG':
                     existing_event.original_derived_image = image_path
                     print('Added JPG to existing image event: ' + basename)
                     SESSION_LOGGER.info('Added JPG to existing event: ' + existing_event.id)
-                    existing_event.populate_derived_metadata()
-                    existing_event.serialize_image_event()
+                    #existing_event.populate_derived_metadata()
+                    #existing_event.serialize_image_event()
                 else:
                     print('ERROR: no matching file extension to augment existing image event.')
                     SESSION_LOGGER.error('No matching file extension to augment existing image event: ' + existing_event.id)
                 # TODO save any updates to event JSON file
+                # Instead of above steps, trying just update_image_event to consolidate code.
+                # This will populate file metadata for each
+                existing_event.update_image_event(original_image_path=image_path)
                 return existing_event
             # Matching event has not been registered
             # Create a new event
@@ -188,9 +191,6 @@ class Session():
                 new_image_event = ImageEvent(session=self, original_image_path=image_path)
                 print('Creating new image event based on : ' + basename)
                 SESSION_LOGGER.info('Created new image event: ' + new_image_event.id + ' based on file: ' + basename)
-                # TEST - stopwatch
-                print('elapsed_time:', self.elapsed_time())
-                print('imaging_rate:', self.imaging_rate(), 'images/min')
                 # Add image_event to session
                 self.image_events.append(new_image_event)
                 # Add image event to client GUI
@@ -268,6 +268,12 @@ class ImageEvent():
         if original_image_path is not None:
             # update image event metadata based on image file
             self.update_image_event(original_image_path=original_image_path)
+            """
+            if session:
+                session.register_image_event(image_path=original_image_path)
+            else:
+                print('ERROR - missing session')
+            """
         else:
             print('ERROR: missing original_image_path')
 
@@ -313,8 +319,6 @@ class ImageEvent():
         print('STATUS:', status)
 
     def update_image_event(self, original_image_path=None):
-        #TODO can probabnly merge all of this into register_image_event
-        #TODO eliminate this
         SESSION_LOGGER.info('Updating image event: ' + self.id)
         if original_image_path is not None:
             basename = os.path.basename(original_image_path)
@@ -351,7 +355,7 @@ class ImageEvent():
             else:
                 self.catalog_number = None
                 self.other_catalog_numbers = None
-                print('WARNING - no barcode found.')
+                #print('WARNING - no barcode found.')
             # evaluate blurriness
             self.evaluate_blurriness()
         else:
@@ -498,6 +502,8 @@ class ImageHandler(PatternMatchingEventHandler):
             print('image_path:', image_path)
             # image_event = self.session.register_image_event(image_path=image_path)
             self.session.register_image_event(image_path=image_path)
+            #self.session.update_image_event_status()
+            #self.update_image_event_status()
             SESSION_LOGGER.info('Image file registered: ' + image_path)
         else:
             print('ERROR, no image_path')
