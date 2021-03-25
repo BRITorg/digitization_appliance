@@ -9,7 +9,7 @@ Pillow==6.0.0
 PyQt5==5.10
 PyQt5-sip==4.19.15
 PyWavelets==1.0.3
-PyYAML==5.1
+PyYAML==5.4
 pyzbar==0.1.8
 requests==2.22.0
 sip==4.19.8
